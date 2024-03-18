@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import static com.product.ProductController.Routes.*;
 
 import java.math.BigDecimal;
@@ -17,9 +18,10 @@ import java.util.List;
 public class ProductController {
     private final ProductService service;
 
-    @PostMapping(ROOT)
-    public ResponseEntity<AddedProductDto> addProduct(@RequestBody ProductRequestDto productRequestDto) {
-        return new ResponseEntity<>(service.addProduct(productRequestDto), HttpStatus.CREATED);
+    @PostMapping(ProductController.Routes.ROOT)
+    @ResponseStatus(HttpStatus.CREATED)
+    public AddedProductDto addProduct(@RequestBody ProductRequestDto productRequestDto) {
+        return service.addProduct(productRequestDto);
     }
 
     @GetMapping(FIND_ALL)
@@ -28,14 +30,35 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(allProducts);
     }
 
-    @GetMapping( FIND_BY_ID)
-    public ProductResponseDto findProductById(@PathVariable Long id) {
-        return service.findProductById(id);
+    @GetMapping(FIND_BY_SORTED_ASC)
+    public ResponseEntity<List<ProductResponseDto>> findAllProductsSortedByPriceAsc() {
+        List<ProductResponseDto> allProducts = service.findAllProductsSortedByPriceAsc();
+        return ResponseEntity.status(HttpStatus.OK).body(allProducts);
+    }
+
+    @GetMapping(FIND_BY_SORTED_DESC)
+    public ResponseEntity<List<ProductResponseDto>> findAllProductsSortedByPriceDesc() {
+        List<ProductResponseDto> allProducts = service.findAllProductsSortedByPriceDesc();
+        return ResponseEntity.status(HttpStatus.OK).body(allProducts);
+    }
+
+    @GetMapping(FIND_BY_ID)
+    public ResponseEntity<ProductResponseDto> findProductById(@PathVariable Long id) {
+        ProductResponseDto product = service.findProductById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(product);
     }
 
     @GetMapping(FIND_BY_CATEGORY)
     public ResponseEntity<List<ProductResponseDto>> getProductsByCategory(@RequestParam("category") ProductCategory productCategory) {
         List<ProductResponseDto> products = service.findProductsByCategory(productCategory);
+        return ResponseEntity.status(HttpStatus.OK).body(products);
+    }
+
+    @GetMapping(FIND_BY_PRICE_RANGE)
+    public ResponseEntity<List<ProductResponseDto>> getProductsByPriceRange(
+            @RequestParam("priceMin") BigDecimal priceMin,
+            @RequestParam("priceMax") BigDecimal priceMax) {
+        List<ProductResponseDto> products = service.findProductsByPriceRange(priceMin, priceMax);
         return ResponseEntity.status(HttpStatus.OK).body(products);
     }
 
@@ -51,9 +74,11 @@ public class ProductController {
         static final String FIND_BY_ID = ROOT + "/{id}";
         static final String FIND_ALL = ROOT + "/all";
         static final String FIND_BY_CATEGORY = ROOT + "/category";
+        static final String FIND_BY_SORTED_ASC = ROOT + "/sorted/price/asc";
+        static final String FIND_BY_SORTED_DESC = ROOT + "/sorted/price/desc";
+        static final String FIND_BY_PRICE_RANGE = ROOT + "/search/range/by-price";
 
     }
-
 
 
 }
