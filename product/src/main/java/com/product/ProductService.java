@@ -2,6 +2,7 @@ package com.product;
 
 import com.product.dto.AddedProductDto;
 import com.product.dto.NewProductDto;
+import com.product.dto.ProductRequestDto;
 import com.product.dto.ProductResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -20,10 +21,10 @@ public class ProductService {
     private final ProductMapper mapper;
 
     @Transactional
-    public AddedProductDto addProduct(NewProductDto newProductDto) {
-        log.debug("Attempting to add a new product: {}", newProductDto.name());
-        Product product = repository.save(mapper.dtoToEntity(newProductDto));
-        log.info("Added product {}, stock quantity = {}", newProductDto.name(), newProductDto.StockQuantity());
+    public AddedProductDto addProduct(ProductRequestDto productRequestDto) {
+        log.debug("Attempting to add a new product: {}", productRequestDto.name());
+        Product product = repository.save(mapper.dtoToEntity(productRequestDto));
+        log.info("Added product {}, stock quantity = {}", productRequestDto.name(), productRequestDto.StockQuantity());
         log.debug("Product added successfully: {}", product);
         return mapper.productToAddedProductResponseDto(product);
     }
