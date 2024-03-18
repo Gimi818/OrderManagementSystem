@@ -1,9 +1,6 @@
 package com.product;
 
-import com.product.dto.AddedProductDto;
-import com.product.dto.NewProductDto;
-import com.product.dto.ProductRequestDto;
-import com.product.dto.ProductResponseDto;
+import com.product.dto.*;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -27,6 +24,26 @@ public class ProductService {
         log.info("Added product {}, stock quantity = {}", productRequestDto.name(), productRequestDto.StockQuantity());
         log.debug("Product added successfully: {}", product);
         return mapper.productToAddedProductResponseDto(product);
+    }
+
+    @Transactional
+    public ProductUpdateStockDto updateStockQuantity(Long id, int newStockQuantity) {
+        log.debug("Updating stock quantity for product with id: {}", id);
+        Product product = repository.findById(id).orElseThrow();
+        product.setStockQuantity(newStockQuantity);
+        repository.save(product);
+        log.info("Stock quantity updated for product with id: {}. New stock quantity: {}", id, newStockQuantity);
+        return mapper.productToProductUpdateStockDto(product);
+    }
+
+    @Transactional
+    public ProductUpdatePriceDto updatePrice(Long id, BigDecimal newPrice) {
+        log.debug("Updating price for product with id: {}", id);
+        Product product = repository.findById(id).orElseThrow();
+        product.setPrice(newPrice);
+        repository.save(product);
+        log.info("Price updated for product with id: {}. New price: {}", id, newPrice);
+        return mapper.productToProductUpdatePriceDto(product);
     }
 
     @Transactional
