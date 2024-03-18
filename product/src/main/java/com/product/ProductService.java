@@ -36,5 +36,10 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-
+    @Transactional
+    public void deleteProduct(Long id) {
+        repository.findById(id).orElseThrow();
+        log.info("Product with id {} deleted", id);
+        repository.deleteById(id);
+    }
 }
