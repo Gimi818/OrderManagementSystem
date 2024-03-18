@@ -1,9 +1,6 @@
 package com.product;
 
-import com.product.dto.AddedProductDto;
-import com.product.dto.NewProductDto;
-import com.product.dto.ProductRequestDto;
-import com.product.dto.ProductResponseDto;
+import com.product.dto.*;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 
@@ -16,5 +13,9 @@ public interface ProductMapper {
     ProductResponseDto productToResponseDto(Product product);
 
     AddedProductDto productToAddedProductResponseDto(Product product);
+
+    ProductUpdateStockDto productToProductUpdateStockDto(Product product);
+
+    ProductUpdatePriceDto productToProductUpdatePriceDto(Product product);
 
 }
