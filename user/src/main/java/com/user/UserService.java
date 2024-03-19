@@ -1,6 +1,7 @@
 package com.user;
 
 import com.user.dto.CreatedUserDto;
+import com.user.dto.UserIdDto;
 import com.user.dto.UserRegistrationDto;
 import com.user.dto.UserResponseDto;
 
@@ -20,6 +21,7 @@ public class UserService {
 
     private final UserRepository repository;
     private final UserMapper mapper;
+    private final KafkaProducer kafkaProducer;
 
 
     @Transactional
@@ -28,6 +30,7 @@ public class UserService {
         existByMail(registration);
         passwordValidation(registration);
         User user = repository.save(mapper.dtoToEntity(registration));
+        kafkaProducer.sendUserIdMessage("sendUserIdMessage", new UserIdDto(user.getId()));
         log.info("New user registered with ID: {} and Email: {}", user.getId(), user.getEmail());
         return mapper.createdEntityToDto(user);
 
