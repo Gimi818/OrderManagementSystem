@@ -1,0 +1,27 @@
+eureka:
+  client:
+    register-with-eureka: false
+server:
+  port: 8222
+spring:
+  application:
+    name: apigateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: products
+          uri: http://localhost:8130
+          predicates:
+            - Path=/api/v1/products/**
+        - id: users
+          uri: http://localhost:8100
+          predicates:
+            - Path=/api/v1/users/**
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
