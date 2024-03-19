@@ -21,7 +21,7 @@ public class KafkaProducer {
     private final ObjectMapper objectMapper;
 
 
-    public void sendMessage(String topic, UserIdDto userIdDto) {
+    public void sendUserIdMessage(String topic, UserIdDto userIdDto) {
 
         try {
             String userIdJson = objectMapper.writeValueAsString(userIdDto);
