@@ -22,6 +22,7 @@ public class ProductController {
         return service.addProduct(productRequestDto);
     }
 
+
     @GetMapping(FIND_ALL)
     public ResponseEntity<List<ProductResponseDto>> findAllProducts() {
         List<ProductResponseDto> allProducts = service.findAllProducts();
@@ -38,9 +39,9 @@ public class ProductController {
 
     @PatchMapping(UPDATE_PRICE)
     public ResponseEntity<ProductUpdatePriceDto> updateProductPrice(
-            @PathVariable ("id")Long id,
+            @PathVariable("id") Long id,
             @RequestBody PriceDto newPrice) {
-        ProductUpdatePriceDto updatedProduct = service.updatePrice(id, newPrice.price());
+        ProductUpdatePriceDto updatedProduct = service.updateProductPrice(id, newPrice.price());
         return ResponseEntity.ok(updatedProduct);
     }
 
@@ -58,7 +59,7 @@ public class ProductController {
 
     @GetMapping(FIND_BY_ID)
     public ResponseEntity<ProductResponseDto> findProductById(@PathVariable Long id) {
-        ProductResponseDto product = service.findProductById(id);
+        ProductResponseDto product = service.findById(id);
         return ResponseEntity.status(HttpStatus.OK).body(product);
     }
 
@@ -82,11 +83,19 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @PostMapping(ADD_PRODUCT_TO_CART)
+    public void addProductToCart(@PathVariable("userId") Long userId,
+                                 @PathVariable("productId") Long productId,
+                                 @RequestParam("stock") int stockQuantity) {
+        service.addProductToCart(userId, productId, stockQuantity);
+    }
+
     static final class Routes {
         static final String ROOT = "/api/v1/products";
         static final String DELETE_BY_ID = ROOT + "/{id}";
         static final String FIND_BY_ID = ROOT + "/{id}";
         static final String FIND_ALL = ROOT + "/all";
+        static final String ADD_PRODUCT_TO_CART = ROOT + "/{userId}/addToCart/{productId}/";
         static final String FIND_BY_CATEGORY = ROOT + "/category";
         static final String FIND_BY_SORTED_ASC = ROOT + "/sorted/price/asc";
         static final String FIND_BY_SORTED_DESC = ROOT + "/sorted/price/desc";

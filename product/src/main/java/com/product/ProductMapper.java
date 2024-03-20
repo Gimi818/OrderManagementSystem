@@ -18,4 +18,6 @@ public interface ProductMapper {
 
     ProductUpdatePriceDto productToProductUpdatePriceDto(Product product);
 
+    AddProductToCartDto productToAddProductToCart(Product product);
+
 }
