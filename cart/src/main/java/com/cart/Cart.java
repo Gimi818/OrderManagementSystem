@@ -21,6 +21,6 @@ public class Cart {
     @CollectionTable(name = "cart_items", joinColumns = @JoinColumn(name = "cart_id"))
     @MapKeyColumn(name = "product_id")
     @Column(name = "quantity")
-    private Map<String, Integer> items = new HashMap<>();
+    private Map<Long, Integer> items = new HashMap<>();
 
 }

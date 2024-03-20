@@ -1,5 +1,6 @@
 package com.cart;
 
+import com.cart.dto.AddProductDto;
 import com.cart.dto.CartRequestDto;
 import com.cart.dto.UserIdDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,4 +32,21 @@ public class KafkaConsumer {
 
         }
     }
+
+    @KafkaListener(topics = "productToCart", groupId = "product-to-cart-group")
+    public void consumeAddProductToCart(String productToAddToCart) {
+        log.debug("Received message from Kafka: {}", productToAddToCart);
+        try {
+            AddProductDto addProductJson = objectMapper.readValue(productToAddToCart, AddProductDto.class);
+            log.info("Deserialized message to AddProductDto ");
+
+            service.addProductToCart(new AddProductDto(addProductJson.userId(), addProductJson.productId(), addProductJson.quantity()));
+            log.info("Successfully added product to cart for user ID: {}", addProductJson.productId());
+        } catch (JsonProcessingException e) {
+            log.error("Error deserializing message : {}", e.getMessage());
+
+        }
+    }
+
+
 }
