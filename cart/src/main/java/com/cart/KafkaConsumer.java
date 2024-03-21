@@ -1,8 +1,7 @@
 package com.cart;
 
 import com.cart.dto.AddProductDto;
-import com.cart.dto.CartRequestDto;
-import com.cart.dto.UserIdDto;
+import com.cart.dto.UserDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -23,7 +22,7 @@ public class KafkaConsumer {
     public void consumeUserIdAndCreateCart(String userIdDtoMessage) {
         log.debug("Received message from Kafka: {}", userIdDtoMessage);
         try {
-            UserIdDto userIdDto = objectMapper.readValue(userIdDtoMessage, UserIdDto.class);
+            UserDto userIdDto = objectMapper.readValue(userIdDtoMessage, UserDto.class);
             log.info("Deserialized message to UserIdDto with ID: {}", userIdDto.id());
             service.createUserCart(userIdDto);
             log.info("Successfully created cart for user ID: {}", userIdDto.id());
