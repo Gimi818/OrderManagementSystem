@@ -1,7 +1,8 @@
 package com.cart;
 
 import com.cart.dto.AddProductDto;
-import com.cart.dto.UserIdDto;
+import com.cart.dto.CartDto;
+import com.cart.dto.UserDto;
 import com.cart.exception.exceptions.AlreadyExistException;
 import com.cart.exception.exceptions.NotFoundException;
 import lombok.AllArgsConstructor;
@@ -19,27 +20,23 @@ import java.util.Map;
 public class CartService {
     private final CartRepository repository;
 
-    public void createUserCart(UserIdDto userIdDto) {
-        log.debug("Attempting to create a cart for user ID: {}", userIdDto.id());
-        if (repository.existsById(userIdDto.id())) {
-            log.warn("Attempt to create a cart for user ID: {} failed. Cart already exists.", userIdDto.id());
-            throw new AlreadyExistException(CART_IS_EXIST, userIdDto.id());
-        }
-        repository.save(creteEmptyCart(userIdDto));
-        log.info("Cart created for user ID: {}", userIdDto.id());
+    public void createUserCart(UserDto user) {
+        log.debug("Attempting to create a cart for user ID: {}", user.id());
+        verifyCartDoesNotExist(user);
+        repository.save(createEmptyCartForUser(user));
+        log.info("Cart created for user ID: {}", user.id());
     }
 
-    public Cart creteEmptyCart(UserIdDto userIdDto) {
-        Cart cart = new Cart();
-        cart.setId(userIdDto.id());
-        cart.setItems(new HashMap<>());
-        return cart;
+    public void verifyCartDoesNotExist(UserDto user) {
+        if (repository.existsById(user.id())) {
+            log.warn("Attempt to create a cart for user ID: {} failed. Cart already exists.", user.id());
+            throw new AlreadyExistException(CART_IS_EXIST, user.id());
+        }
     }
 
     public void addProductToCart(AddProductDto newProduct) {
         log.debug("Attempting to add product to cart. Cart ID: {}, Product id: {}", newProduct.userId(), newProduct.productId());
-        Cart cart = repository.findById(newProduct.userId()).orElseThrow(() ->
-                new NotFoundException(NOT_FOUND_BY_ID, newProduct.userId()));
+        Cart cart = findCartById(newProduct.userId());
         Map<Long, Integer> items = cart.getItems();
         items.merge(newProduct.productId(), newProduct.quantity(), Integer::sum);
         repository.save(cart);
@@ -48,8 +45,7 @@ public class CartService {
 
     public void removeProductFromCart(Long cartId, Long productId) {
         log.debug("Attempting to remove product from cart. Cart ID: {}, Product ID: {}", cartId, productId);
-        Cart cart = repository.findById(cartId).orElseThrow(() ->
-                new NotFoundException(NOT_FOUND_BY_ID, cartId));
+        Cart cart = findCartById(cartId);
 
         Map<Long, Integer> items = cart.getItems();
         Integer removed = items.remove(productId);
@@ -60,8 +56,26 @@ public class CartService {
         } else {
             log.warn("Attempt to remove non-existent product from cart. Cart ID: {}, Product ID: {}", cartId, productId);
 
-
         }
+    }
+
+    public Cart findCartById(Long cartId) {
+        log.debug("Attempting to find a cart with ID: {}", cartId);
+        Cart cart = repository.findById(cartId).orElseThrow(() ->
+                new NotFoundException(NOT_FOUND_BY_ID, cartId));
+        log.info("Cart found with ID: {}", cartId);
+        return cart;
+    }
+    public CartDto getCartContents(Long cartId) {
+        return repository.findById(cartId)
+                .map(cart -> new CartDto(cart.getItems()))
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_BY_ID, cartId));
+    }
+    public Cart createEmptyCartForUser(UserDto user) {
+        Cart cart = new Cart();
+        cart.setId(user.id());
+        cart.setItems(new HashMap<>());
+        return cart;
     }
 
     static final class ErrorMessages {
