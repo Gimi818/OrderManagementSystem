@@ -21,10 +21,6 @@ spring:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-application:
-  config:
-    emailSender-url: http://localhost:8022/api/v1
-
 
 management:
   tracing:
