@@ -21,6 +21,7 @@ public class Product {
 
     private String name;
     private BigDecimal price;
-    private int StockQuantity;
+    private int stockQuantity;
+    @Enumerated(value = EnumType.STRING)
     private ProductCategory productCategory;
 }

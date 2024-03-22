@@ -6,6 +6,6 @@ import java.math.BigDecimal;
 
 public record NewProductDto(String name,
                             BigDecimal price,
-                            int StockQuantity,
+                            int stockQuantity,
                             ProductCategory productCategory) {
 }

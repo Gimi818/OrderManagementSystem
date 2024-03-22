@@ -39,7 +39,7 @@ public class KafkaConsumer {
             AddProductDto addProductJson = objectMapper.readValue(productToAddToCart, AddProductDto.class);
             log.info("Deserialized message to AddProductDto ");
 
-            service.addProductToCart(new AddProductDto(addProductJson.userId(), addProductJson.productId(), addProductJson.quantity()));
+            service.addProductToCart(new AddProductDto(addProductJson.userId(), addProductJson.productId(), addProductJson.stockQuantity()));
             log.info("Successfully added product to cart for user ID: {}", addProductJson.productId());
         } catch (JsonProcessingException e) {
             log.error("Error deserializing message : {}", e.getMessage());

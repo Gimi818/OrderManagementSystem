@@ -26,7 +26,7 @@ public class ProductService {
         log.debug("Attempting to add a new product: {}", productRequestDto.name());
         Product product = mapper.dtoToEntity(productRequestDto);
         product = repository.save(product);
-        log.info("Added product {}, stock quantity = {}", productRequestDto.name(), productRequestDto.StockQuantity());
+        log.info("Added product {}, stock quantity = {}", productRequestDto.name(), productRequestDto.stockQuantity());
         return mapper.productToAddedProductResponseDto(product);
     }
 
@@ -40,7 +40,7 @@ public class ProductService {
     public void addProductToCart(Long userId, Long productId, int quantity) {
         log.info("Processing addProductToCart, userId: {}, productId: {}, quantity: {}", userId, productId, quantity);
         Product product = findProductById(productId);
-        AddProductToCartDto addProductToCartDto = mapper.productToAddProductToCart(product);
+        AddProductToCartDto addProductToCartDto = new AddProductToCartDto(userId, product.getId(), quantity);
         kafkaProducer.sendProductToCartMessage("productToCart", addProductToCartDto);
         log.info("Product added to cart and message sent, userId: {}, productId: {}", userId, productId);
     }
