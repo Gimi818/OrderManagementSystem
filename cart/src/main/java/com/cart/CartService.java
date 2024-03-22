@@ -34,9 +34,9 @@ public class CartService {
         log.debug("Attempting to add product to cart. Cart ID: {}, Product id: {}", newProduct.userId(), newProduct.productId());
         Cart cart = findCartById(newProduct.userId());
         Map<Long, Integer> items = cart.getItems();
-        items.merge(newProduct.productId(), newProduct.quantity(), Integer::sum);
+        items.merge(newProduct.productId(), newProduct.stockQuantity(), Integer::sum);
         repository.save(cart);
-        log.info("Product added to cart. Cart ID: {}, Product ID: {}, Quantity: {}", newProduct.userId(), newProduct.productId(), newProduct.quantity());
+        log.info("Product added to cart. Cart ID: {}, Product ID: {}, Quantity: {}", newProduct.userId(), newProduct.productId(), newProduct.stockQuantity());
     }
 
     @Transactional

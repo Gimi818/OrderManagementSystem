@@ -12,7 +12,7 @@ spring:
         locator:
           enabled: true
       routes:
-        - id: products
+        - id: product
           uri: http://localhost:8130
           predicates:
             - Path=/api/v1/products/**
@@ -20,6 +20,10 @@ spring:
           uri: http://localhost:8100
           predicates:
             - Path=/api/v1/users/**
+        - id: carts
+          uri: http://localhost:8140
+          predicates:
+            - Path=/api/v1/carts/**
 
 management:
   tracing:
