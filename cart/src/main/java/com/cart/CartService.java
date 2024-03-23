@@ -1,13 +1,13 @@
 package com.cart;
 
-import com.cart.dto.AddProductDto;
-import com.cart.dto.CartDto;
-import com.cart.dto.UserDto;
+import com.cart.dto.*;
 import com.cart.exception.exceptions.AlreadyExistException;
 import com.cart.exception.exceptions.NotFoundException;
+
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+
 import org.springframework.stereotype.Service;
 
 import static com.cart.CartService.ErrorMessages.*;
@@ -64,11 +64,6 @@ public class CartService {
         return cart;
     }
 
-    public CartDto getCartContents(Long cartId) {
-        return repository.findById(cartId)
-                .map(cart -> new CartDto(cart.getItems()))
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_BY_ID, cartId));
-    }
 
     public Cart createEmptyCartForUser(UserDto user) {
         Cart cart = new Cart();
@@ -86,6 +81,7 @@ public class CartService {
 
     static final class ErrorMessages {
         static final String NOT_FOUND_BY_ID = "Cart with id %d not found";
+        static final String PRODUCT_NOT_FOUND = "Product with id %d not found";
         static final String CART_IS_EXIST = "Cart for user ID: %d already exists";
     }
 }
