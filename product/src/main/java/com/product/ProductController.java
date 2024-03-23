@@ -1,6 +1,7 @@
 package com.product;
 
 import com.product.dto.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class ProductController {
 
     @PostMapping(ProductController.Routes.ROOT)
     @ResponseStatus(HttpStatus.CREATED)
-    public AddedProductDto addProduct(@RequestBody ProductRequestDto productRequestDto) {
+    public AddedProductDto addProduct(@RequestBody @Valid ProductRequestDto productRequestDto) {
         return service.addProduct(productRequestDto);
     }
 

@@ -20,6 +20,10 @@ spring:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+application:
+  config:
+    products-url: http://localhost:8222/api/v1/products
+
 management:
   tracing:
     sampling:

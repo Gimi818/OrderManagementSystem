@@ -1,6 +1,8 @@
 package com.cart.dto;
 
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.List;
 
-public record CartDto (Map<Long, Integer> items){
+public record CartDto ( List<ProductItem> items,
+                        BigDecimal totalPrice){
 }
