@@ -1,9 +1,6 @@
 package com.cart;
 
-import com.cart.dto.CartDto;
-import com.cart.dto.ProductInfo;
-import com.cart.dto.ProductItem;
-import com.cart.dto.ProductResponseDto;
+import com.cart.dto.*;
 import com.cart.exception.exceptions.NotFoundException;
 import com.cart.productClient.ProductClient;
 import lombok.AllArgsConstructor;
@@ -15,9 +12,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import static com.cart.CartService.ErrorMessages.NOT_FOUND_BY_ID;
 import static com.cart.CartService.ErrorMessages.PRODUCT_NOT_FOUND;
 
 @Service
@@ -41,22 +36,31 @@ public class CartRetrievalService {
         return repository.findById(cartId)
                 .map(cart -> {
                     List<ProductItem> itemList = new ArrayList<>();
-                    BigDecimal totalPrice = BigDecimal.ZERO;
 
-                    for (Map.Entry<Long, Integer> entry : cart.getItems().entrySet()) {
-                        Long productId = entry.getKey();
-                        Integer quantity = entry.getValue();
+                    for (CartItem item : cart.getItems()) {
+                        Long productId = item.getProductId();
+                        Integer quantity = item.getQuantity();
 
                         ProductInfo productInfo = getProductInfo(productId);
-                        BigDecimal itemTotalPrice = productInfo.price().multiply(BigDecimal.valueOf(quantity));
-                        totalPrice = totalPrice.add(itemTotalPrice);
 
                         itemList.add(new ProductItem(productId, productInfo.name(), quantity));
                     }
-
+                    BigDecimal totalPrice = calculateTotalCartPrice(cart);
                     return new CartDto(itemList, totalPrice);
                 })
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_BY_ID, cartId));
+                .orElseThrow(() -> new NotFoundException("Cart not found with ID: " + cartId));
     }
 
+    public BigDecimal calculateTotalCartPrice(Cart cart) {
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        for (CartItem item : cart.getItems()) {
+            Long productId = item.getProductId();
+            Integer quantity = item.getQuantity();
+
+            ProductInfo productInfo = getProductInfo(productId);
+            BigDecimal itemTotalPrice = productInfo.price().multiply(BigDecimal.valueOf(quantity));
+            totalPrice = totalPrice.add(itemTotalPrice);
+        }
+        return totalPrice;
+    }
 }

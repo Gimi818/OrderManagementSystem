@@ -1,5 +1,6 @@
-package com.cart;
+package com.cart.kafka;
 
+import com.cart.CartService;
 import com.cart.dto.AddProductDto;
 import com.cart.dto.UserDto;
 import com.fasterxml.jackson.core.JsonProcessingException;

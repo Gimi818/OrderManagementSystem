@@ -1,6 +1,7 @@
 package com.product;
 
 import com.product.dto.*;
+import com.product.kafka.KafkaProducer;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
