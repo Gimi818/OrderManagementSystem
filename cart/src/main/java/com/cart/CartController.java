@@ -4,10 +4,7 @@ import com.cart.dto.CartDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.cart.CartController.Routes.*;
 
@@ -28,12 +25,17 @@ public class CartController {
         cartService.removeProductFromCart(cartId, productId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+    @PostMapping(PLACE_ORDER)
+    public ResponseEntity<String> initiateOrder(@PathVariable (name = "cartId")Long cartId) {
+        cartService.initiateOrderProcess(cartId);
+        return ResponseEntity.ok("Order initiation started for cart ID: " + cartId);
+    }
 
     static final class Routes {
         static final String ROOT = "/api/v1/carts";
         static final String GET_CART_CONTENTS = ROOT + "/{cartId}/contents";
         static final String DELETE_PRODUCT_FROM_CART = ROOT + "/{cartId}/{productId}";
-
+        static final String PLACE_ORDER = ROOT +"/order/{cartId}";
     }
 
 }
