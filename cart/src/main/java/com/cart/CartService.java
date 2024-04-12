@@ -4,6 +4,7 @@ import com.cart.dto.*;
 import com.cart.exception.exceptions.AlreadyExistException;
 import com.cart.exception.exceptions.NotFoundException;
 
+import com.cart.kafka.KafkaProducer;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -12,14 +13,34 @@ import org.springframework.stereotype.Service;
 
 import static com.cart.CartService.ErrorMessages.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 @Log4j2
 public class CartService {
     private final CartRepository repository;
+    private final KafkaProducer kafkaProducer;
+    private final CartRetrievalService cartRetrievalService;
+
+    public void initiateOrderProcess(Long id) {
+        log.debug("Initiating order process for cart ID: {}", id);
+        kafkaProducer.initiateOrder("order-initiated", prepareCartForOrder(id));
+        log.info("Order process initiated for cart ID: {}", id);
+
+    }
+
+    public PreparedCartToOrder prepareCartForOrder(Long id) {
+        Cart cart = findCartById(id);
+        if (cart == null) {
+            throw new NotFoundException("Cart not found with ID: " + id);
+        }
+        BigDecimal totalPrice = cartRetrievalService.calculateTotalCartPrice(cart);
+
+        return new PreparedCartToOrder(cart, totalPrice);
+    }
 
     @Transactional
     public void createUserCart(UserDto user) {
@@ -33,26 +54,42 @@ public class CartService {
     public void addProductToCart(AddProductDto newProduct) {
         log.debug("Attempting to add product to cart. Cart ID: {}, Product id: {}", newProduct.userId(), newProduct.productId());
         Cart cart = findCartById(newProduct.userId());
-        Map<Long, Integer> items = cart.getItems();
-        items.merge(newProduct.productId(), newProduct.stockQuantity(), Integer::sum);
+
+        Optional<CartItem> existingItem = cart.getItems().stream()
+                .filter(item -> item.getProductId().equals(newProduct.productId()))
+                .findFirst();
+
+        if (existingItem.isPresent()) {
+            CartItem item = existingItem.get();
+            item.setQuantity(item.getQuantity() + newProduct.stockQuantity());
+        } else {
+            CartItem newItem = new CartItem();
+            newItem.setCart(cart);
+            newItem.setProductId(newProduct.productId());
+            newItem.setQuantity(newProduct.stockQuantity());
+            cart.getItems().add(newItem);
+        }
+
         repository.save(cart);
         log.info("Product added to cart. Cart ID: {}, Product ID: {}, Quantity: {}", newProduct.userId(), newProduct.productId(), newProduct.stockQuantity());
     }
+
 
     @Transactional
     public void removeProductFromCart(Long cartId, Long productId) {
         log.debug("Attempting to remove product from cart. Cart ID: {}, Product ID: {}", cartId, productId);
         Cart cart = findCartById(cartId);
 
-        Map<Long, Integer> items = cart.getItems();
-        Integer removed = items.remove(productId);
+        Optional<CartItem> itemToRemove = cart.getItems().stream()
+                .filter(item -> item.getProductId().equals(productId))
+                .findFirst();
 
-        if (removed != null) {
+        if (itemToRemove.isPresent()) {
+            cart.getItems().remove(itemToRemove.get());
             repository.save(cart);
             log.info("Product removed from cart. Cart ID: {}, Product ID: {}", cartId, productId);
         } else {
             log.warn("Attempt to remove non-existent product from cart. Cart ID: {}, Product ID: {}", cartId, productId);
-
         }
     }
 
@@ -68,7 +105,7 @@ public class CartService {
     public Cart createEmptyCartForUser(UserDto user) {
         Cart cart = new Cart();
         cart.setId(user.id());
-        cart.setItems(new HashMap<>());
+        cart.setItems(new HashSet<>());
         return cart;
     }
 
