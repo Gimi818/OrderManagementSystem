@@ -1,10 +1,12 @@
 package com.cart;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "cart")
@@ -12,15 +14,25 @@ import java.util.Map;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode
 public class Cart {
 
     @Id
     private Long id;
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "cart_items", joinColumns = @JoinColumn(name = "cart_id"))
-    @MapKeyColumn(name = "product_id")
-    @Column(name = "quantity")
-    private Map<Long, Integer> items = new HashMap<>();
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonManagedReference
+    private Set<CartItem> items = new HashSet<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cart cart = (Cart) o;
+        return Objects.equals(id, cart.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
 }
