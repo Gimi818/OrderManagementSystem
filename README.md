@@ -1,3 +1,4 @@
+# Project in progress
 This project is a microservice-based e-commerce system designed to enhance shopping experience through efficient and scalable service architecture. Utilizing Apache Kafka for inter-service communication, it ensures real-time data synchronization and event-driven processing. The system comprises several key services:
   * User Service: Manages user registration and account details, providing functionalities such as account creation and user authentication.
   * Product Service: Handles the product catalog, allowing for the addition, browsing, and searching of products within the store.
