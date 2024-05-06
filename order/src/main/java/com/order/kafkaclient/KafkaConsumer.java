@@ -3,6 +3,7 @@ package com.order.kafkaclient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.order.OrderService;
+import com.order.dto.ConfirmationOrderStatus;
 import com.order.dto.PreparedCartToOrder;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,7 +19,7 @@ public class KafkaConsumer {
     private final OrderService service;
 
 
-    @KafkaListener(topics = "order-initiated",groupId = "order-group")
+    @KafkaListener(topics = "order-initiated", groupId = "order-group")
     public void consumeOrder(String message) {
         log.debug("Received message from Kafka: {}", message);
         try {
@@ -30,4 +31,20 @@ public class KafkaConsumer {
             log.error("Error deserializing message to Cart: {}", e.getMessage());
         }
     }
+
+    @KafkaListener(topics = "order-confirmation", groupId = "order-group")
+    public void catchOrderConfirmation(String message) {
+        log.debug("Received message from Kafka: {}", message);
+        try {
+            ConfirmationOrderStatus order = objectMapper.readValue(message, ConfirmationOrderStatus.class);
+            log.info("Deserialized message to Order with ID: {}", order.statusId());
+
+            service.confirmOrder(order);
+
+            log.info("Successfully created order  ID: {}", order.statusId());
+        } catch (JsonProcessingException e) {
+            log.error("Error deserializing message to Cart: {}", e.getMessage());
+        }
+    }
+
 }
