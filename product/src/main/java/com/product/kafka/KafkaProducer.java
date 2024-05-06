@@ -2,7 +2,8 @@ package com.product.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.product.dto.AddProductToCartDto;
+import com.product.dto.order.OrderStatus;
+import com.product.dto.product.AddProductToCartDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -36,6 +37,23 @@ public class KafkaProducer {
             log.error("Could not serialize AddProductToCartDto object to JSON", e);
         }
     }
+
+    public void sendOrderStatus(String topic , OrderStatus order){
+        try {
+            String orderStatus = objectMapper.writeValueAsString(order);
+            log.info("Sending confirmation, topic: {}, Order id: {}", topic, order.statusId());
+            CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, orderStatus).toCompletableFuture();
+            future.thenAccept(result -> log.info("Successfully sent message to topic: {}, Order id : {}", topic, order.statusId()))
+                    .exceptionally(ex -> {
+                        log.error("Failed to send message to topic: {}, error: {}", topic, ex.getMessage());
+                        return null;
+                    });
+        } catch (JsonProcessingException e) {
+            log.error("Could not serialize orderId object to JSON", e);
+        }
+
+    }
+
 
 
 }
