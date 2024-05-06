@@ -1,6 +1,6 @@
 package com.product;
 
-import com.product.dto.*;
+import com.product.dto.product.*;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 
