@@ -1,6 +1,6 @@
 package com.product;
 
-import com.product.dto.*;
+import com.product.dto.product.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
