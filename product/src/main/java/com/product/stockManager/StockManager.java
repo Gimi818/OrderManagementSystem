@@ -11,6 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import com.product.dto.order.OrderItem;
@@ -23,17 +24,30 @@ public class StockManager {
     private final ProductRepository repository;
     private final KafkaProducer kafkaProducer;
 
+    private final Map<Long, Object> productLocks = new ConcurrentHashMap<>();
 
     @Transactional
     public void checkInventory(StockVerificationOrder order) {
         Map<Long, Integer> productIdToRequiredQuantity = getOrderProductQuantities(order);
         List<Product> products = repository.findAllById(productIdToRequiredQuantity.keySet());
 
-        if (areAllProductsInStock(products, productIdToRequiredQuantity)) {
-            sendOrderConfirmation(order.id(), products, productIdToRequiredQuantity);
-        } else {
-            kafkaProducer.sendOrderStatus("order-confirmation", new OrderStatus(order.id(), false));
+        synchronized (getLocks(productIdToRequiredQuantity.keySet())) {
+            if (areAllProductsInStock(products, productIdToRequiredQuantity)) {
+                sendOrderConfirmation(order.id(), products, productIdToRequiredQuantity);
+            } else {
+                kafkaProducer.sendOrderStatus("order-confirmation", new OrderStatus(order.id(), false));
+            }
         }
+    }
+
+    private Object[] getLocks(Iterable<Long> productIds) {
+        List<Long> productIdList = new ArrayList<>();
+        productIds.forEach(productIdList::add);
+
+        return productIdList.stream()
+                .sorted()
+                .map(id -> productLocks.computeIfAbsent(id, k -> new Object()))
+                .toArray();
     }
 
     void sendOrderConfirmation(Long orderId, List<Product> products, Map<Long, Integer> productIdToRequiredQuantity) {
