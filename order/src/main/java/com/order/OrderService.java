@@ -3,6 +3,7 @@ package com.order;
 import com.order.dto.*;
 import com.order.kafkaclient.KafkaProducer;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Log4j2
 public class OrderService {
     private final OrderRepository orderRepository;
     private final KafkaProducer kafkaProducer;
@@ -22,19 +24,17 @@ public class OrderService {
     }
 
 
-    private Set<OrderItemDto> mapOrderItemsToDto(Set<OrderItem> orderItems) {
-        return orderItems.stream()
-                .map(item -> new OrderItemDto(item.getProductId(), item.getQuantity()))
-                .collect(Collectors.toSet());
-    }
-
-    public void confirmOrder(ConfirmationOrderStatus confirmationOrderStatus) {
-        Order order = orderRepository.findById(confirmationOrderStatus.statusId()).orElseThrow();
-        if (confirmationOrderStatus.status())
+    public void confirmOrRejectOrder(ConfirmationOrderStatus confirmationOrderStatus) {
+        Order order = orderRepository.findById(confirmationOrderStatus.statusId()).orElseThrow();//dodac exception
+        if (confirmationOrderStatus.status()) {
             order.setOrderStatus(OrderStatus.ACCEPTED);
-        else {
+            kafkaProducer.sendConfirmationOrderEmail("ConfirmationOrderEmail", order);
+            log.info("Order {} accepted and confirmation email sent.", order.getId());
+        } else {
             order.setOrderStatus(OrderStatus.CANCELLED);
+            log.info("Order {} cancelled.", order.getId());
         }
+
         orderRepository.save(order);
     }
 
@@ -42,7 +42,7 @@ public class OrderService {
         Set<OrderItem> orderItems = convertCartItemsToOrderItems(preparedCart.cart().items());
         Order newOrder = Order.builder()
                 .userId(preparedCart.cart().id())
-                .orderName(generateOrderName())
+                .orderName(OrderNameGenerator.generate())
                 .orderStatus(OrderStatus.PENDING)
                 .totalPrice(preparedCart.price())
                 .items(orderItems)
@@ -54,19 +54,24 @@ public class OrderService {
     private Set<OrderItem> convertCartItemsToOrderItems(Set<CartItem> cartItems) {
         return cartItems.stream().map(cartItem -> {
             OrderItem orderItem = new OrderItem();
+            orderItem.setProductName(cartItem.productName());
             orderItem.setProductId(cartItem.productId());
             orderItem.setQuantity(cartItem.quantity());
             return orderItem;
         }).collect(Collectors.toSet());
     }
 
-    public static String generateOrderName() {
-        Random random = new Random();
-        final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        StringBuilder name = new StringBuilder(8);
-        for (int i = 0; i < 8; i++) {
-            name.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
-        }
-        return name.toString();
-    }
+
+//    private OrderEmail toOrderEmail(Order order) {
+//        Set<OrderItemDto> items = order.getItems().stream()
+//                .map(item -> new OrderItemDto(item.getProductId(), item.getProductName(), item.getQuantity(), item.getPrice()))
+//                .collect(Collectors.toSet());
+//
+//        return new OrderEmail(order.getOrderName(), order.getTotalPrice(), items);
+//    }
+private Set<OrderItemDto> mapOrderItemsToDto(Set<OrderItem> orderItems) {
+    return orderItems.stream()
+            .map(item -> new OrderItemDto(item.getProductId(), item.getQuantity()))
+            .collect(Collectors.toSet());
+}
 }
