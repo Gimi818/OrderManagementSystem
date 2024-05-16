@@ -34,11 +34,7 @@ public class CartService {
 
     public PreparedCartToOrder prepareCartForOrder(Long id) {
         Cart cart = findCartById(id);
-        if (cart == null) {
-            throw new NotFoundException("Cart not found with ID: " + id);
-        }
         BigDecimal totalPrice = cartRetrievalService.calculateTotalCartPrice(cart);
-
         return new PreparedCartToOrder(cart, totalPrice);
     }
 
@@ -55,9 +51,7 @@ public class CartService {
         log.debug("Attempting to add product to cart. Cart ID: {}, Product id: {}", newProduct.userId(), newProduct.productId());
         Cart cart = findCartById(newProduct.userId());
 
-        Optional<CartItem> existingItem = cart.getItems().stream()
-                .filter(item -> item.getProductId().equals(newProduct.productId()))
-                .findFirst();
+        Optional<CartItem> existingItem = findCartItem(cart,newProduct.productId());
 
         if (existingItem.isPresent()) {
             CartItem item = existingItem.get();
@@ -80,9 +74,7 @@ public class CartService {
         log.debug("Attempting to remove product from cart. Cart ID: {}, Product ID: {}", cartId, productId);
         Cart cart = findCartById(cartId);
 
-        Optional<CartItem> itemToRemove = cart.getItems().stream()
-                .filter(item -> item.getProductId().equals(productId))
-                .findFirst();
+        Optional<CartItem> itemToRemove = findCartItem(cart,productId);
 
         if (itemToRemove.isPresent()) {
             cart.getItems().remove(itemToRemove.get());
@@ -114,8 +106,14 @@ public class CartService {
             log.warn("Attempt to create a cart for user ID: {} failed. Cart already exists.", user.id());
             throw new AlreadyExistException(CART_IS_EXIST, user.id());
         }
-    }
 
+
+    }
+    private Optional<CartItem> findCartItem(Cart cart, Long productId) {
+        return cart.getItems().stream()
+                .filter(item -> item.getProductId().equals(productId))
+                .findFirst();
+    }
     static final class ErrorMessages {
         static final String NOT_FOUND_BY_ID = "Cart with id %d not found";
         static final String PRODUCT_NOT_FOUND = "Product with id %d not found";
