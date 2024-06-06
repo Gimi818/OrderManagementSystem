@@ -39,7 +39,7 @@ public class KafkaConsumer {
             ConfirmationOrderStatus order = objectMapper.readValue(message, ConfirmationOrderStatus.class);
             log.info("Deserialized message to Order with ID: {}", order.statusId());
 
-            service.confirmOrder(order);
+            service.handleOrderConfirmation(order);
 
             log.info("Successfully created order  ID: {}", order.statusId());
         } catch (JsonProcessingException e) {

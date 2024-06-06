@@ -15,7 +15,7 @@ import java.util.ResourceBundle;
 public class OrderConfirmationEmail {
     private final JavaMailSender javaMailSender;
 
-    private void sendEmail(String recipientEmail) throws MessagingException {
+    void sendEmail(String recipientEmail) throws MessagingException {
         ResourceBundle bundle = ResourceBundle.getBundle("messages", Locale.getDefault());
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -23,7 +23,6 @@ public class OrderConfirmationEmail {
         helper.setTo(recipientEmail);
         helper.setSubject(bundle.getString("email.subject"));
         helper.setText(bundle.getString("email.thankYouMessage"), true);
-
 
         javaMailSender.send(message);
     }
