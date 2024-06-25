@@ -10,6 +10,9 @@ spring:
   application:
     name: emailSender
 
+application:
+  config:
+    user-url: http://localhost:8100/api/v1/users
 
 management:
   tracing:

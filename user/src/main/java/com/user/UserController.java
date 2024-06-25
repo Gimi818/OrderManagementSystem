@@ -27,11 +27,17 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
     }
 
+    @GetMapping(FIND_USER_EMAIL_BY_ID)
+    public ResponseEntity<String> getUserEmail(@PathVariable Long id) {
+        String email = service.findUserById(id).email();
+        return ResponseEntity.status(HttpStatus.OK).body(email);
+    }
+
     static final class Routes {
         static final String ROOT = "/api/v1/users";
         static final String REGISTRATION = ROOT + "/registration";
-        static final String CONFIRM = ROOT + "/confirm";
         static final String FIND_USER_BY_ID = ROOT + "/{id}";
+        static final String FIND_USER_EMAIL_BY_ID = ROOT + "/email/{id}";
 
     }
 }
