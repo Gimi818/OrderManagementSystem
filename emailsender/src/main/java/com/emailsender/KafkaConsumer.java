@@ -18,7 +18,7 @@ public class KafkaConsumer {
     public void listenForEmailWithTicket(String emailWithTicketJson) {
         try {
             OrderDto order = objectMapper.readValue(emailWithTicketJson, OrderDto.class);
-            orderConfirmationEmail.sendEmail(order.email());
+            orderConfirmationEmail.sendEmail(order);
         } catch (JsonProcessingException | MessagingException e) {
             e.printStackTrace();
         }
