@@ -1,5 +1,6 @@
 package com.emailsender;
 
+import com.emailsender.dto.OrderDto;
 import com.emailsender.feginClient.UserClient;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

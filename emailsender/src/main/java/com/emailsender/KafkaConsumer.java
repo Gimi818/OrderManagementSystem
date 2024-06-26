@@ -1,5 +1,6 @@
 package com.emailsender;
 
+import com.emailsender.dto.OrderDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
