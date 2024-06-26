@@ -21,6 +21,8 @@ public class Order {
     @Enumerated(value = EnumType.STRING)
     private OrderStatus orderStatus;
     private BigDecimal totalPrice;
+    @Embedded
+    private DeliveryAddress deliveryAddress;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<OrderItem> items = new HashSet<>();
