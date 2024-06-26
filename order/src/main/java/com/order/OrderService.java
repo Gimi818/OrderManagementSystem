@@ -58,6 +58,7 @@ public class OrderService {
                 .orderName(OrderNameGenerator.generate())
                 .orderStatus(OrderStatus.PENDING)
                 .totalPrice(preparedCart.price())
+                .deliveryAddress(preparedCart.deliveryAddress())
                 .items(orderItems)
                 .build();
         orderItems.forEach(item -> item.setOrder(newOrder));

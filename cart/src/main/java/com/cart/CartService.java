@@ -25,17 +25,17 @@ public class CartService {
     private final KafkaProducer kafkaProducer;
     private final CartRetrievalService cartRetrievalService;
 
-    public void initiateOrderProcess(Long id) {
+    public void initiateOrderProcess(Long id, DeliveryAddress deliveryAddress) {
         log.debug("Initiating order process for cart ID: {}", id);
-        kafkaProducer.initiateOrder("order-initiated", prepareCartForOrder(id));
+        kafkaProducer.initiateOrder("order-initiated", prepareCartForOrder(id,deliveryAddress));
         log.info("Order process initiated for cart ID: {}", id);
 
     }
 
-    public PreparedCartToOrder prepareCartForOrder(Long id) {
+    public PreparedCartToOrder prepareCartForOrder(Long id, DeliveryAddress deliveryAddress) {
         Cart cart = findCartById(id);
         BigDecimal totalPrice = cartRetrievalService.calculateTotalCartPrice(cart);
-        return new PreparedCartToOrder(cart, totalPrice);
+        return new PreparedCartToOrder(cart, deliveryAddress ,totalPrice);
     }
 
     @Transactional

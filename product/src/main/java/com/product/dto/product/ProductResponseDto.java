@@ -4,7 +4,7 @@ import com.product.ProductCategory;
 
 import java.math.BigDecimal;
 
-public record ProductResponseDto(String name,
+public record ProductResponseDto(Long id ,String name,
                                  BigDecimal price,
                                  ProductCategory productCategory
 ) {

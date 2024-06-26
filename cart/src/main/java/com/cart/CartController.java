@@ -1,5 +1,6 @@
 package com.cart;
 
+import com.cart.dto.DeliveryAddress;
 import com.cart.dto.CartDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,8 +27,8 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
     @PostMapping(PLACE_ORDER)
-    public ResponseEntity<String> initiateOrder(@PathVariable (name = "cartId")Long cartId) {
-        cartService.initiateOrderProcess(cartId);
+    public ResponseEntity<String> initiateOrder(@PathVariable (name = "cartId")Long cartId, @RequestBody DeliveryAddress deliveryAddress) {
+        cartService.initiateOrderProcess(cartId , deliveryAddress);
         return ResponseEntity.ok("Order initiation started for cart ID: " + cartId);
     }
 

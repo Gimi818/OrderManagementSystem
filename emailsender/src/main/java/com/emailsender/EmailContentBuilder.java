@@ -1,5 +1,7 @@
 package com.emailsender;
 
+import com.emailsender.dto.DeliveryAddress;
+import com.emailsender.dto.OrderDto;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
@@ -13,7 +15,9 @@ public class EmailContentBuilder {
         this.bundle = ResourceBundle.getBundle("messages", Locale.getDefault());
     }
 
+
     public String buildOrderConfirmationEmail(OrderDto order) {
+        DeliveryAddress address = order.deliveryAddress();
         return String.format(
                 "<html>" +
                         "<head>" +
@@ -35,22 +39,24 @@ public class EmailContentBuilder {
                         "<p>Dziękujemy za zakupy w naszym sklepie. Poniżej znajdują się szczegóły Twojego zamówienia:</p>" +
                         "<p><strong>Numer zamówienia:</strong> %s</p>" +
                         "<p><strong>Wartość zamówienia:</strong> %.2f zł</p>" +
-                        "<p><strong>Status zamówienia:</strong> Pakowane</p>" +
+                        "<p><strong>Status zamówienia:</strong> W trakcie realizacji</p>" +
+                        "<p><strong>Adres dostawy:</strong> %s, %s, ul. %s %s</p>" +
                         "<p>Twoje zamówienie jest obecnie przygotowywane do wysyłki. Otrzymasz kolejną wiadomość e-mail, gdy zamówienie zostanie wysłane.</p>" +
                         "<br>" +
                         "<p>Z poważaniem,<br>Twój zespół Sklepu</p>" +
                         "<br>" +
                         "<div class='footer'>" +
-                        "<p>Skontaktuj się z nami: <a href='mailto:wojtekapachekafka@gmail.com'>support@example.com</a> | +48 123 456 789</p>" +
-                        "<p><img src='cid:logoImage' alt='Logo'></p>" +
-                        "</div>" +
+                        "<p>Skontaktuj się z nami: <a href='mailto:wojtekapachekafka@gmail.com'>wojtekapachekafka@gmail.com</a> | +48 123 456 789</p>" +
+                        "<p><img src='cid:logoImage' alt='Logo' style='width: 233px;'></p>" +                    "</div>" +
                         "</div>" +
                         "</body>" +
                         "</html>",
                 order.orderName(),
-                order.totalPrice(),
-                order.orderName()
+                order.totalPrice().doubleValue(),
+                address.city(),
+                address.postcode(),
+                address.street(),
+                address.houseNumber()
         );
     }
-    }
-
+}

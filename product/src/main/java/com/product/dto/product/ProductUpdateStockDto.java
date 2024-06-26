@@ -2,7 +2,7 @@ package com.product.dto.product;
 
 
 
-public record ProductUpdateStockDto(String name,
+public record ProductUpdateStockDto(Long id ,String name,
 
                                     int stockQuantity) {
 }
