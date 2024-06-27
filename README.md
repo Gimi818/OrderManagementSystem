@@ -1,17 +1,23 @@
 # Project in progress
-This project is a microservice-based e-commerce system designed to enhance shopping experience through efficient and scalable service architecture. Utilizing Apache Kafka for inter-service communication, it ensures real-time data synchronization and event-driven processing. The system comprises several key services:
+This project is a microservice-based e-commerce system designed to enhance the shopping experience through an efficient and scalable service architecture. Utilizing Apache Kafka for inter-service communication ensures real-time data synchronization and event-driven processing. The system comprises several key services:
   * User Service: Manages user registration and account details, providing functionalities such as account creation and user authentication.
   * Product Service: Handles the product catalog, allowing for the addition, browsing, and searching of products within the store.
-  * Cart Service: Creates shopping carts for users and supports adding products to carts. It leverages Kafka to maintain consistent cart states across the system.
-  * Order Service: Manages order placement and verification of product availability. It coordinates with the Delivery Service for shipping arrangements and uses the EmailSender Service for sending order confirmations to customers.
-  * Delivery Service: Oversees the logistics of order deliveries, including tracking and delivery method selection.
+  *  Cart Service: Creates shopping carts for users and supports adding products to carts. It leverages Kafka to maintain consistent cart states across the system.
+  * Order Service: Manages order placement and verification of product availability. It coordinates with the Delivery Service for shipping arrangements and uses the EmailSender Service for sending order   * confirmations to customers.
   * EmailSender Service: Automates customer communication via email for registration confirmations, order updates, and other notifications.
-
 Built on Spring Boot for ease of deployment and PostgreSQL for reliable data storage.
+
+Configuration:
+
+  * API Gateway: Acts as an intermediary layer between various microservices, allowing communication with different services through a single port or endpoint.
+* Database: PostgreSQL is used to manage data relationships, containerized using Docker.
+* Monitoring and Tracing: Zipkin traces HTTP requests passing through various microservices in the application.
+* Service Registration: Eureka Server registers microservices and informs about their availability.
+* Configuration Management: ConfigServer is responsible for centralized storage and distribution of configuration for microservices.
+* Inter-Service Communication: Microservices communicate with each other over HTTP by exposing endpoints and using Feign Client.
 
 
  ## Application is developed using following technologies:
- Core:
 <p align="left"><a href="https://www.java.com" target="_blank" rel="noreferrer"> 
 <img src="https://ultimateqa.com/wp-content/uploads/2020/12/Java-logo-icon-1.png" alt="java" width="80" height="50"/> 
 </a> <a href="https://spring.io/" target="_blank" rel="noreferrer"> <img src="https://e4developer.com/wp-content/uploads/2018/01/spring-boot.png" alt="spring" width="90" height="50"/> 
