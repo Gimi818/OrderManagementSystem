@@ -56,7 +56,7 @@ public class UserService {
         return mapper.entityToDto(user);
     }
 
-    private void passwordValidation(UserRegistrationDto registrationDto) {
+     void passwordValidation(UserRegistrationDto registrationDto) {
         log.debug("Validating password for user email: {}", registrationDto.email());
         if (!registrationDto.password().equals(registrationDto.repeatedPassword())) {
             log.warn("Password validation failed for user email: {}", registrationDto.email());
@@ -64,7 +64,7 @@ public class UserService {
         }
     }
 
-    private void existByMail(UserRegistrationDto registrationDto) {
+    void existByMail(UserRegistrationDto registrationDto) {
         log.debug("Checking existence of user by email: {}", registrationDto.email());
         if (repository.existsByEmail(registrationDto.email())) {
             log.warn("User registration attempted with existing email: {}", registrationDto.email());
