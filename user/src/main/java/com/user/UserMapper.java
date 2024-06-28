@@ -12,9 +12,7 @@ import org.springframework.stereotype.Component;
 public interface UserMapper {
     UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
-    User dtoToEntity(UserRegistrationDto registrationDto);
-
-   UserResponseDto entityToDto(User user);
+    UserResponseDto entityToDto(User user);
 
     CreatedUserDto createdEntityToDto(User user);
 
